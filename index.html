@@ -429,6 +429,99 @@
   }
   .free-box strong{ color: var(--spruce); }
 
+  /* ---------- Comments ---------- */
+  .comment-form{
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 20px;
+    margin-bottom: 32px;
+  }
+  .comment-form-row{ display: flex; flex-direction: column; gap: 6px; }
+  .comment-form-row label{
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-soft);
+  }
+  .comment-form-row input,
+  .comment-form-row textarea{
+    font-family: var(--font-body);
+    font-size: 14.5px;
+    color: var(--ink);
+    border: 1.5px solid var(--line);
+    border-radius: 5px;
+    padding: 10px 12px;
+    background: var(--paper);
+    resize: vertical;
+  }
+  .comment-form-row input:focus,
+  .comment-form-row textarea:focus{
+    outline: none;
+    border-color: var(--spruce);
+  }
+  .comment-submit{
+    align-self: flex-start;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--paper);
+    background: var(--spruce);
+    border: none;
+    border-radius: 999px;
+    padding: 12px 24px;
+    cursor: pointer;
+  }
+  .comment-submit:hover{ background: var(--ink); }
+
+  .comment-empty{ font-size: 14px; color: var(--mist); }
+  .comment-item{ padding: 16px 0; border-top: 1px solid var(--line); }
+  .comment-item:first-child{ border-top: none; }
+  .comment-meta{
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 6px;
+    flex-wrap: wrap;
+  }
+  .comment-name{
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--spruce);
+    font-weight: 600;
+  }
+  .comment-time{
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--mist);
+  }
+  .comment-text{
+    font-size: 14.5px;
+    color: var(--ink);
+    margin: 0 0 6px;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+  }
+  .comment-remove{
+    font-family: var(--font-mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--mist);
+    background: none;
+    border: none;
+    padding: 4px 0;
+    cursor: pointer;
+  }
+  .comment-remove:hover{ color: var(--rail-red); }
+
   /* ---------- Footer ---------- */
   footer{
     padding: 36px 0 60px;
@@ -487,6 +580,7 @@
     <a href="#online" data-page="online">Buy Online</a>
     <a href="#packing" data-page="packing">Packing</a>
     <a href="#costs" data-page="costs">Costs</a>
+    <a href="#comments" data-page="comments">Comments</a>
   </div>
 </nav>
 
@@ -600,7 +694,7 @@
 
     <div class="page-nav">
       <a href="#" class="is-disabled" aria-hidden="true" tabindex="-1">&larr; Prev</a>
-      <span class="page-progress">01 / 04</span>
+      <span class="page-progress">01 / 05</span>
       <a href="#online" data-page="online">Buy Online &rarr;</a>
     </div>
   </section>
@@ -672,7 +766,7 @@
 
     <div class="page-nav">
       <a href="#schedule" data-page="schedule">&larr; Schedule</a>
-      <span class="page-progress">02 / 04</span>
+      <span class="page-progress">02 / 05</span>
       <a href="#packing" data-page="packing">Packing &rarr;</a>
     </div>
   </section>
@@ -759,7 +853,7 @@
 
     <div class="page-nav">
       <a href="#online" data-page="online">&larr; Buy Online</a>
-      <span class="page-progress">03 / 04</span>
+      <span class="page-progress">03 / 05</span>
       <a href="#costs" data-page="costs">Costs &rarr;</a>
     </div>
   </section>
@@ -799,7 +893,38 @@
 
     <div class="page-nav">
       <a href="#packing" data-page="packing">&larr; Packing</a>
-      <span class="page-progress">04 / 04</span>
+      <span class="page-progress">04 / 05</span>
+      <a href="#comments" data-page="comments">Comments &rarr;</a>
+    </div>
+  </section>
+
+  <!-- ================= COMMENTS ================= -->
+  <section id="comments">
+    <div class="section-head">
+      <span class="section-num">05</span>
+      <h2>Additional Suggestions</h2>
+    </div>
+    <p class="section-note">Pick a nickname, then leave a tip, idea, or change for the trip.</p>
+
+    <form id="comment-form" class="comment-form">
+      <div class="comment-form-row">
+        <label for="comment-name">Nickname</label>
+        <input type="text" id="comment-name" name="name" maxlength="30" required placeholder="e.g. Andy">
+      </div>
+      <div class="comment-form-row">
+        <label for="comment-text">Suggestion</label>
+        <textarea id="comment-text" name="text" rows="3" maxlength="500" required placeholder="Add a tip, change, or idea for the trip&hellip;"></textarea>
+      </div>
+      <button type="submit" class="comment-submit">Post Suggestion</button>
+    </form>
+
+    <div id="comment-list" class="comment-list" aria-live="polite">
+      <p class="comment-empty" id="comment-empty">No suggestions yet &mdash; be the first to add one.</p>
+    </div>
+
+    <div class="page-nav">
+      <a href="#costs" data-page="costs">&larr; Costs</a>
+      <span class="page-progress">05 / 05</span>
       <a href="#" class="is-disabled" aria-hidden="true" tabindex="-1">Next &rarr;</a>
     </div>
   </section>
@@ -846,7 +971,7 @@
 <script>
   /* ---------- Paged navigation: sections act like flipped pages, not a long scroll ---------- */
   (function(){
-    var order = ['schedule', 'online', 'packing', 'costs'];
+    var order = ['schedule', 'online', 'packing', 'costs', 'comments'];
     var main = document.querySelector('main.wrap');
     var sections = {};
     order.forEach(function(id){ sections[id] = document.getElementById(id); });
@@ -923,6 +1048,99 @@
       sections[initial].classList.add('is-active');
       setActiveNav(initial);
     }
+  })();
+</script>
+
+<script>
+  /* ---------- Additional Suggestions (comments) ---------- */
+  (function(){
+    var STORAGE_KEY = 'swiss-trip-comments';
+    var NAME_KEY = 'swiss-trip-name';
+
+    var form = document.getElementById('comment-form');
+    var nameInput = document.getElementById('comment-name');
+    var textInput = document.getElementById('comment-text');
+    var list = document.getElementById('comment-list');
+    var emptyMsg = document.getElementById('comment-empty');
+
+    var comments = [];
+    try { comments = JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch(e) { comments = []; }
+
+    try {
+      var savedName = localStorage.getItem(NAME_KEY);
+      if(savedName) nameInput.value = savedName;
+    } catch(e) {}
+
+    function formatTime(ts){
+      var d = new Date(ts);
+      return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) +
+        ' · ' + d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+    }
+
+    function persist(){
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(comments)); } catch(e) {}
+    }
+
+    function render(){
+      list.querySelectorAll('.comment-item').forEach(function(el){ el.remove(); });
+      emptyMsg.style.display = comments.length ? 'none' : 'block';
+
+      comments.slice().reverse().forEach(function(c){
+        var item = document.createElement('div');
+        item.className = 'comment-item';
+
+        var meta = document.createElement('div');
+        meta.className = 'comment-meta';
+        var name = document.createElement('span');
+        name.className = 'comment-name';
+        name.textContent = c.name;
+        var time = document.createElement('span');
+        time.className = 'comment-time';
+        time.textContent = formatTime(c.ts);
+        meta.appendChild(name);
+        meta.appendChild(time);
+
+        var text = document.createElement('p');
+        text.className = 'comment-text';
+        text.textContent = c.text;
+
+        var remove = document.createElement('button');
+        remove.type = 'button';
+        remove.className = 'comment-remove';
+        remove.textContent = 'Remove';
+        remove.addEventListener('click', function(){
+          comments = comments.filter(function(x){ return x.id !== c.id; });
+          persist();
+          render();
+        });
+
+        item.appendChild(meta);
+        item.appendChild(text);
+        item.appendChild(remove);
+        list.appendChild(item);
+      });
+    }
+
+    form.addEventListener('submit', function(e){
+      e.preventDefault();
+      var name = nameInput.value.trim();
+      var text = textInput.value.trim();
+      if(!name || !text) return;
+
+      try { localStorage.setItem(NAME_KEY, name); } catch(e) {}
+      comments.push({
+        id: Date.now() + '-' + Math.random().toString(36).slice(2),
+        name: name,
+        text: text,
+        ts: Date.now()
+      });
+      persist();
+      textInput.value = '';
+      render();
+      textInput.focus();
+    });
+
+    render();
   })();
 </script>
 
