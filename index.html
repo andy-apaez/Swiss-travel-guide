@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Switzerland — Trip Plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+
+  :root{
+    --ink:        #1C2B2E;
+    --ink-soft:   #4A5A58;
+    --mist:       #8B9490;
+    --line:       #DADFDA;
+    --paper:      #F5F6F4;
+    --surface:    #FFFFFF;
+    --rail-red:   #EB0000;
+    --rail-red-dim: #FBDCDC;
+    --spruce:     #3B6255;
+    --spruce-dim: #E1EAE5;
+
+    --font-display: 'Space Grotesk', 'Archivo', sans-serif;
+    --font-body:    'Inter', -apple-system, sans-serif;
+    --font-mono:    'JetBrains Mono', 'SF Mono', monospace;
+
+    --max: 860px;
+  }
+
+  *{ box-sizing: border-box; }
+
+  html{ scroll-behavior: smooth; }
+
+  body{
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-body);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior: auto; }
+    *{ animation: none !important; transition: none !important; }
+  }
+
+  a{ color: var(--spruce); text-decoration-thickness: 1.5px; text-underline-offset: 2px; }
+  a:focus-visible, button:focus-visible, input:focus-visible{
+    outline: 2px solid var(--rail-red);
+    outline-offset: 2px;
+  }
+
+  /* ---------- Layout shell ---------- */
+  .wrap{
+    max-width: var(--max);
+    margin: 0 auto;
+    padding: 0 24px;
+    padding-left: max(24px, env(safe-area-inset-left));
+    padding-right: max(24px, env(safe-area-inset-right));
+  }
+
+  /* ---------- Masthead ---------- */
+  .masthead{
+    background: var(--ink);
+    color: var(--paper);
+    padding: 56px 0 40px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .peaks{
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    width: 100%; height: 120px;
+    opacity: 0.5;
+  }
+
+  .masthead .wrap{ position: relative; z-index: 1; }
+
+  .clock{
+    width: 46px; height: 46px;
+    border-radius: 50%;
+    border: 2.5px solid var(--paper);
+    position: relative;
+    margin-bottom: 22px;
+    flex: none;
+  }
+  .clock::before, .clock::after{
+    content: "";
+    position: absolute;
+    background: var(--paper);
+    top: 50%; left: 50%;
+    transform-origin: 0 0;
+  }
+  .clock::before{ /* minute hand */
+    width: 2px; height: 13px;
+    transform: translate(-1px, -13px) rotate(35deg);
+  }
+  .clock::after{ /* second hand, red */
+    width: 1.5px; height: 17px;
+    background: var(--rail-red);
+    transform: translate(-0.75px, -17px) rotate(150deg);
+  }
+
+  .eyebrow{
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--rail-red);
+    margin: 0 0 10px;
+  }
+
+  h1.title{
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(32px, 6vw, 48px);
+    line-height: 1.05;
+    margin: 0 0 14px;
+    letter-spacing: -0.01em;
+  }
+
+  .subline{
+    font-size: 15.5px;
+    color: #C7D0CD;
+    max-width: 46ch;
+    margin: 0;
+  }
+
+  /* ---------- Quick nav ---------- */
+  .quicknav{
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    background: var(--surface);
+    border-bottom: 1px solid var(--line);
+    padding: 14px 0;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .quicknav a{
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-soft);
+    text-decoration: none;
+    padding: 6px 12px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+  .quicknav a:hover{ border-color: var(--rail-red); color: var(--rail-red); }
+  .quicknav a.is-active{
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--paper);
+  }
+
+  /* ---------- Sections (paged, "flip" navigation) ---------- */
+  section{ padding: 56px 0; border-bottom: 1px solid var(--line); }
+  section:last-of-type{ border-bottom: none; }
+
+  main.wrap > section{ display: none; }
+  main.wrap > section.is-active{ display: block; }
+  main.wrap > section:focus{ outline: none; }
+
+  main.wrap > section.enter-next{ animation: page-in-next 0.42s cubic-bezier(.22,.61,.36,1) both; }
+  main.wrap > section.enter-prev{ animation: page-in-prev 0.42s cubic-bezier(.22,.61,.36,1) both; }
+
+  @keyframes page-in-next{
+    from{ opacity: 0; transform: translateX(36px); }
+    to{ opacity: 1; transform: none; }
+  }
+  @keyframes page-in-prev{
+    from{ opacity: 0; transform: translateX(-36px); }
+    to{ opacity: 1; transform: none; }
+  }
+
+  /* ---------- Page nav (prev / next "flip" controls) ---------- */
+  .page-nav{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+  }
+  .page-nav a{
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    text-decoration: none;
+    color: var(--ink-soft);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 10px 16px;
+    white-space: nowrap;
+  }
+  .page-nav a:hover{ border-color: var(--rail-red); color: var(--rail-red); }
+  .page-nav a.is-disabled{ visibility: hidden; }
+  .page-nav .page-progress{
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    color: var(--mist);
+    letter-spacing: 0.04em;
+  }
+
+  .section-head{
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin-bottom: 30px;
+  }
+  .section-num{
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--rail-red);
+    border: 1.5px solid var(--rail-red);
+    border-radius: 4px;
+    padding: 2px 7px;
+  }
+  .section-head h2{
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 24px;
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+  .section-note{
+    font-size: 13.5px;
+    color: var(--mist);
+    margin: -18px 0 28px;
+  }
+
+  /* ---------- Schedule (departure-board style) ---------- */
+  .day{
+    display: grid;
+    grid-template-columns: 74px 1fr;
+    gap: 20px;
+    padding: 22px 0;
+    border-top: 1px solid var(--line);
+  }
+  .day:first-of-type{ border-top: none; }
+
+  .day-marker{ text-align: left; }
+  .day-num{
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 34px;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .day-num span{ color: var(--rail-red); }
+  .day-date{
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    color: var(--mist);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-top: 6px;
+  }
+
+  .day-rows{ display: flex; flex-direction: column; gap: 10px; }
+  .day-row{
+    display: grid;
+    grid-template-columns: 92px 1fr;
+    gap: 14px;
+    align-items: baseline;
+  }
+  .day-time{
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--spruce);
+    white-space: nowrap;
+  }
+  .day-activity{ font-size: 15px; }
+  .day-activity .tag{
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--mist);
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    padding: 1px 5px;
+    margin-left: 7px;
+    transform: translateY(-1px);
+  }
+
+  @media (max-width: 560px){
+    .day{ grid-template-columns: 52px 1fr; }
+    .day-num{ font-size: 26px; }
+    .day-row{ grid-template-columns: 70px 1fr; }
+  }
+
+  /* ---------- Checklists ---------- */
+  .checklist-group{ margin-bottom: 30px; }
+  .checklist-group:last-child{ margin-bottom: 0; }
+  .checklist-group h3{
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-soft);
+    margin: 0 0 14px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--ink);
+    display: inline-block;
+  }
+  .checklist-group.urgent h3{ border-bottom-color: var(--rail-red); color: var(--rail-red); }
+  .checklist-group.later h3{ border-bottom-color: var(--spruce); color: var(--spruce); }
+
+  ul.check{ list-style: none; margin: 0; padding: 0; }
+  ul.check li{
+    display: flex;
+    align-items: flex-start;
+    gap: 11px;
+    padding: 8px 0;
+    border-top: 1px solid var(--line);
+  }
+  ul.check li:first-child{ border-top: none; }
+
+  ul.check input[type="checkbox"]{
+    appearance: none;
+    -webkit-appearance: none;
+    width: 18px; height: 18px;
+    border: 1.5px solid var(--ink-soft);
+    border-radius: 3px;
+    margin: 1px 0 0;
+    flex: none;
+    cursor: pointer;
+    position: relative;
+    background: var(--surface);
+  }
+  ul.check input[type="checkbox"]:checked{
+    background: var(--spruce);
+    border-color: var(--spruce);
+  }
+  ul.check input[type="checkbox"]:checked::after{
+    content: "";
+    position: absolute;
+    left: 5px; top: 1px;
+    width: 5px; height: 9px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(40deg);
+  }
+  ul.check label{ font-size: 14.5px; cursor: pointer; }
+  ul.check li.checked label{ color: var(--mist); text-decoration: line-through; }
+  ul.check .meta{
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--mist);
+    margin-top: 2px;
+  }
+  ul.check .meta a{ color: var(--mist); }
+
+  .cols{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 36px;
+  }
+  @media (max-width: 620px){ .cols{ grid-template-columns: 1fr; gap: 8px; } }
+
+  .plain-note{
+    font-size: 14px;
+    color: var(--ink-soft);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 14px 16px;
+    margin-top: 4px;
+  }
+
+  /* ---------- Cost table ---------- */
+  .table-scroll{ overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table.costs{
+    width: 100%;
+    min-width: 420px;
+    border-collapse: collapse;
+    font-family: var(--font-mono);
+    font-size: 13.5px;
+  }
+  table.costs th{
+    text-align: left;
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--mist);
+    padding: 0 0 10px;
+    border-bottom: 2px solid var(--ink);
+  }
+  table.costs th.num, table.costs td.num{ text-align: right; }
+  table.costs td{ padding: 11px 0; border-bottom: 1px solid var(--line); }
+  table.costs tr.total td{
+    border-bottom: none;
+    border-top: 2px solid var(--ink);
+    font-weight: 600;
+    color: var(--ink);
+    padding-top: 14px;
+  }
+  table.costs tr.grand td{
+    color: var(--rail-red);
+    font-weight: 700;
+    font-size: 15px;
+  }
+  .costs-caption{
+    font-size: 13px;
+    color: var(--mist);
+    margin: 0 0 20px;
+  }
+  .free-box{
+    margin-top: 26px;
+    background: var(--spruce-dim);
+    border-radius: 6px;
+    padding: 16px 18px;
+    font-size: 13.5px;
+    color: var(--ink);
+  }
+  .free-box strong{ color: var(--spruce); }
+
+  /* ---------- Footer ---------- */
+  footer{
+    padding: 36px 0 60px;
+    text-align: center;
+  }
+  footer p{
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    color: var(--mist);
+    letter-spacing: 0.03em;
+    margin: 0;
+  }
+
+  @media print{
+    .quicknav{ display: none; }
+    .masthead{ background: var(--ink) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    section{ break-inside: avoid; }
+    main.wrap > section{ display: block !important; animation: none !important; }
+    .page-nav{ display: none; }
+  }
+
+  /* ---------- Small screens ---------- */
+  @media (max-width: 480px){
+    .wrap{ padding-left: max(16px, env(safe-area-inset-left)); padding-right: max(16px, env(safe-area-inset-right)); }
+    .masthead{ padding: 40px 0 28px; }
+    section{ padding: 40px 0; }
+    .quicknav{ padding: 10px 0; }
+    .quicknav a{ padding: 9px 13px; font-size: 12px; }
+    .page-nav a{ padding: 12px 16px; }
+  }
+
+  @media (hover: none) and (pointer: coarse){
+    ul.check input[type="checkbox"]{ width: 21px; height: 21px; }
+    ul.check li{ padding: 10px 0; cursor: pointer; }
+  }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <svg class="peaks" viewBox="0 0 900 120" preserveAspectRatio="none" aria-hidden="true">
+    <polyline points="0,120 90,45 170,90 260,20 350,95 430,55 520,110 610,35 700,85 790,50 900,100 900,120 0,120"
+      fill="none" stroke="#3A4A4D" stroke-width="1.5"/>
+  </svg>
+  <div class="wrap">
+    <div class="clock" aria-hidden="true"></div>
+    <p class="eyebrow">Lauterbrunnen &middot; Group of 3</p>
+    <h1 class="title">Switzerland Trip Plan</h1>
+    <p class="subline">17&ndash;24 August 2026 &mdash; full schedule, what to buy online, what to pack, and the running cost total.</p>
+  </div>
+</header>
+
+<nav class="quicknav" aria-label="Trip sections">
+  <div class="wrap" style="display:flex; gap:8px; flex-wrap:wrap;">
+    <a href="#schedule" data-page="schedule" class="is-active">Schedule</a>
+    <a href="#online" data-page="online">Buy Online</a>
+    <a href="#packing" data-page="packing">Packing</a>
+    <a href="#costs" data-page="costs">Costs</a>
+  </div>
+</nav>
+
+<main class="wrap">
+
+  <!-- ================= SCHEDULE ================= -->
+  <section id="schedule" class="is-active">
+    <div class="section-head">
+      <span class="section-num">01</span>
+      <h2>Full Schedule</h2>
+    </div>
+
+    <div class="day">
+      <div class="day-marker">
+        <div class="day-num"><span>1</span></div>
+        <div class="day-date">Mon &middot; Aug 17</div>
+      </div>
+      <div class="day-rows">
+        <div class="day-row"><div class="day-time">6:00 AM</div><div class="day-activity">Land in Z&uuml;rich</div></div>
+        <div class="day-row"><div class="day-time">Morning</div><div class="day-activity">Train to Lauterbrunnen <span class="tag">~2.5 hr</span></div></div>
+        <div class="day-row"><div class="day-time">Late AM</div><div class="day-activity">Check in &amp; rest</div></div>
+        <div class="day-row"><div class="day-time">Afternoon</div><div class="day-activity">Tr&uuml;mmelbach Falls</div></div>
+        <div class="day-row"><div class="day-time">Evening</div><div class="day-activity">Staubbach Falls <span class="tag">optional &middot; free</span></div></div>
+      </div>
+    </div>
+
+    <div class="day">
+      <div class="day-marker">
+        <div class="day-num"><span>2</span></div>
+        <div class="day-date">Tue &middot; Aug 18</div>
+      </div>
+      <div class="day-rows">
+        <div class="day-row"><div class="day-time">Morning</div><div class="day-activity">M&auml;nnlichen ridge walk <span class="tag">free w/ pass</span></div></div>
+        <div class="day-row"><div class="day-time">Afternoon</div><div class="day-activity">Gr&uuml;tschalp &amp; Winteregg <span class="tag">free w/ pass</span></div></div>
+      </div>
+    </div>
+
+    <div class="day">
+      <div class="day-marker">
+        <div class="day-num"><span>3</span></div>
+        <div class="day-date">Wed &middot; Aug 19</div>
+      </div>
+      <div class="day-rows">
+        <div class="day-row"><div class="day-time">Morning</div><div class="day-activity">Boat to Iseltwald <span class="tag">free w/ pass</span></div></div>
+        <div class="day-row"><div class="day-time">Midday</div><div class="day-activity">Giessbach Falls <span class="tag">same boat line</span></div></div>
+        <div class="day-row"><div class="day-time">Late PM</div><div class="day-activity">Harder Kulm <span class="tag">sunset &middot; free w/ pass</span></div></div>
+        <div class="day-row"><div class="day-time">Evening</div><div class="day-activity">Return to Lauterbrunnen</div></div>
+      </div>
+    </div>
+
+    <div class="day">
+      <div class="day-marker">
+        <div class="day-num"><span>4</span></div>
+        <div class="day-date">Thu &middot; Aug 20</div>
+      </div>
+      <div class="day-rows">
+        <div class="day-row"><div class="day-time">Full day</div><div class="day-activity">Grindelwald First &mdash; Cliff Walk <span class="tag">free</span>, plus Flyer / Glider / Mountain Cart / Trottibike <span class="tag">pay in person, arrive early</span></div></div>
+      </div>
+    </div>
+
+    <div class="day">
+      <div class="day-marker">
+        <div class="day-num"><span>5</span></div>
+        <div class="day-date">Fri &middot; Aug 21</div>
+      </div>
+      <div class="day-rows">
+        <div class="day-row"><div class="day-time">Morning</div><div class="day-activity">Schilthorn &amp; Piz Gloria</div></div>
+        <div class="day-row"><div class="day-time">Afternoon</div><div class="day-activity">Via Ferrata M&uuml;rren &rarr; Gimmelwald <span class="tag">self-guided &middot; ~3&ndash;4 hr</span></div></div>
+      </div>
+    </div>
+
+    <div class="day">
+      <div class="day-marker">
+        <div class="day-num"><span>6</span></div>
+        <div class="day-date">Sat &middot; Aug 22</div>
+      </div>
+      <div class="day-rows">
+        <div class="day-row"><div class="day-time">Morning&ndash;Mid</div><div class="day-activity">Oeschinensee, Kandersteg <span class="tag">book ascent slot</span></div></div>
+        <div class="day-row"><div class="day-time">Afternoon</div><div class="day-activity">Blausee</div></div>
+      </div>
+    </div>
+
+    <div class="day">
+      <div class="day-marker">
+        <div class="day-num"><span>7</span></div>
+        <div class="day-date">Sun &middot; Aug 23</div>
+      </div>
+      <div class="day-rows">
+        <div class="day-row"><div class="day-time">Morning</div><div class="day-activity">Train to Lucerne</div></div>
+        <div class="day-row"><div class="day-time">Midday</div><div class="day-activity">Explore Lucerne &mdash; Chapel Bridge, old town, Lion Monument</div></div>
+        <div class="day-row"><div class="day-time">Evening</div><div class="day-activity">Train to Z&uuml;rich</div></div>
+        <div class="day-row"><div class="day-time">Night</div><div class="day-activity">Hotel near airport</div></div>
+      </div>
+    </div>
+
+    <div class="day">
+      <div class="day-marker">
+        <div class="day-num"><span>8</span></div>
+        <div class="day-date">Mon &middot; Aug 24</div>
+      </div>
+      <div class="day-rows">
+        <div class="day-row"><div class="day-time">Morning</div><div class="day-activity">Flight to Madrid <span class="tag">lands 9:55 AM</span></div></div>
+        <div class="day-row"><div class="day-time">10:20 AM</div><div class="day-activity">Metro or taxi into Madrid center</div></div>
+        <div class="day-row"><div class="day-time">11:00 AM</div><div class="day-activity">Puerta del Sol &amp; Plaza Mayor</div></div>
+        <div class="day-row"><div class="day-time">12:00 PM</div><div class="day-activity">Royal Palace</div></div>
+        <div class="day-row"><div class="day-time">1:30 PM</div><div class="day-activity">Tapas lunch</div></div>
+        <div class="day-row"><div class="day-time">3:00 PM</div><div class="day-activity">Retiro Park</div></div>
+        <div class="day-row"><div class="day-time">7:55 PM</div><div class="day-activity">Depart Madrid &rarr; NYC</div></div>
+      </div>
+    </div>
+
+    <div class="page-nav">
+      <a href="#" class="is-disabled" aria-hidden="true" tabindex="-1">&larr; Prev</a>
+      <span class="page-progress">01 / 04</span>
+      <a href="#online" data-page="online">Buy Online &rarr;</a>
+    </div>
+  </section>
+
+  <!-- ================= ONLINE PURCHASES ================= -->
+  <section id="online">
+    <div class="section-head">
+      <span class="section-num">02</span>
+      <h2>What to Buy Online</h2>
+    </div>
+
+    <div class="cols">
+      <div class="checklist-group urgent">
+        <h3>Buy Soon</h3>
+        <ul class="check">
+          <li data-id="on-oesch">
+            <input type="checkbox" id="on-oesch">
+            <div>
+              <label for="on-oesch">Oeschinensee ascent time slot</label>
+              <span class="meta">CHF 40/person &middot; <a href="https://www.oeschinensee.ch/en/tarife-fahrplan/" target="_blank" rel="noopener">oeschinensee.ch</a></span>
+            </div>
+          </li>
+          <li data-id="on-schilthorn">
+            <input type="checkbox" id="on-schilthorn">
+            <div>
+              <label for="on-schilthorn">Schilthorn / Piz Gloria</label>
+              <span class="meta">skip the queue &middot; <a href="https://schilthorn.ch/en/Tickets" target="_blank" rel="noopener">schilthorn.ch</a></span>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="checklist-group later">
+        <h3>Anytime Before Departure</h3>
+        <ul class="check">
+          <li data-id="on-pass">
+            <input type="checkbox" id="on-pass">
+            <div>
+              <label for="on-pass">Jungfrau Travel Pass (7-day)</label>
+              <span class="meta">CHF 310/pp &middot; select &ldquo;No discount&rdquo; &middot; <a href="https://www.jungfrau.ch/en-gb/jungfrau-travel-pass/" target="_blank" rel="noopener">jungfrau.ch</a></span>
+            </div>
+          </li>
+          <li data-id="on-esim">
+            <input type="checkbox" id="on-esim">
+            <div>
+              <label for="on-esim">Swisscom eSIM</label>
+              <span class="meta">install before landing &middot; <a href="https://www.swisscom.ch/en/residential/mobile-subscription/prepaid/tourists.html" target="_blank" rel="noopener">swisscom.ch</a></span>
+            </div>
+          </li>
+          <li data-id="on-lucerne">
+            <input type="checkbox" id="on-lucerne">
+            <div>
+              <label for="on-lucerne">Lucerne train ticket</label>
+              <span class="meta">SBB Mobile App &middot; no rush</span>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="checklist-group" style="margin-top:32px;">
+      <h3>Pay In Person &mdash; Nothing to Buy Online</h3>
+      <p class="plain-note">
+        Grindelwald First gondola (covered by the pass) &middot; First Flyer / Glider / Mountain Cart / Trottibike (valley station, day-of only) &middot;
+        Tr&uuml;mmelbach Falls &middot; Blausee &middot; Via Ferrata gear rental (Intersport M&uuml;rren) &middot;
+        M&auml;nnlichen, Iseltwald, Giessbach Falls, Harder Kulm, Gr&uuml;tschalp &amp; Winteregg, Staubbach Falls &mdash; all free with the pass.
+      </p>
+    </div>
+
+    <div class="page-nav">
+      <a href="#schedule" data-page="schedule">&larr; Schedule</a>
+      <span class="page-progress">02 / 04</span>
+      <a href="#packing" data-page="packing">Packing &rarr;</a>
+    </div>
+  </section>
+
+  <!-- ================= PACKING ================= -->
+  <section id="packing">
+    <div class="section-head">
+      <span class="section-num">03</span>
+      <h2>Packing List</h2>
+    </div>
+
+    <div class="cols">
+      <div>
+        <div class="checklist-group">
+          <h3>Documents &amp; Money</h3>
+          <ul class="check">
+            <li data-id="p-passport"><input type="checkbox" id="p-passport"><label for="p-passport">Passport (valid 6+ months)</label></li>
+            <li data-id="p-confirm"><input type="checkbox" id="p-confirm"><label for="p-confirm">Flight / hotel / pass confirmations</label></li>
+            <li data-id="p-card"><input type="checkbox" id="p-card"><label for="p-card">Card (bank notified of travel)</label></li>
+            <li data-id="p-cash"><input type="checkbox" id="p-cash"><label for="p-cash">Some Swiss francs cash</label></li>
+          </ul>
+        </div>
+
+        <div class="checklist-group">
+          <h3>Clothing</h3>
+          <ul class="check">
+            <li data-id="c-base"><input type="checkbox" id="c-base"><label for="c-base">Moisture-wicking base layers</label></li>
+            <li data-id="c-fleece"><input type="checkbox" id="c-fleece"><label for="c-fleece">Fleece / light insulating jacket</label></li>
+            <li data-id="c-shell"><input type="checkbox" id="c-shell"><label for="c-shell">Waterproof / windproof shell</label></li>
+            <li data-id="c-pants"><input type="checkbox" id="c-pants"><label for="c-pants">Quick-dry hiking pants &amp; shorts</label></li>
+            <li data-id="c-swim"><input type="checkbox" id="c-swim"><label for="c-swim">Swimwear</label></li>
+            <li data-id="c-hat"><input type="checkbox" id="c-hat"><label for="c-hat">Warm hat &amp; light gloves</label></li>
+            <li data-id="c-sunhat"><input type="checkbox" id="c-sunhat"><label for="c-sunhat">Sun hat</label></li>
+            <li data-id="c-madrid"><input type="checkbox" id="c-madrid"><label for="c-madrid">Light clothes for Madrid layover</label></li>
+            <li data-id="c-socks"><input type="checkbox" id="c-socks"><label for="c-socks">Extra hiking socks</label></li>
+          </ul>
+        </div>
+
+        <div class="checklist-group">
+          <h3>Footwear</h3>
+          <ul class="check">
+            <li data-id="f-boots"><input type="checkbox" id="f-boots"><label for="f-boots">Broken-in hiking boots <span class="meta">needed for Via Ferrata</span></label></li>
+            <li data-id="f-walk"><input type="checkbox" id="f-walk"><label for="f-walk">Comfortable walking shoes</label></li>
+            <li data-id="f-sandal"><input type="checkbox" id="f-sandal"><label for="f-sandal">Sandals / flip-flops</label></li>
+          </ul>
+        </div>
+      </div>
+
+      <div>
+        <div class="checklist-group">
+          <h3>Hiking &amp; Via Ferrata</h3>
+          <ul class="check">
+            <li data-id="h-pack"><input type="checkbox" id="h-pack"><label for="h-pack">Small daypack (20&ndash;25L)</label></li>
+            <li data-id="h-bottle"><input type="checkbox" id="h-bottle"><label for="h-bottle">Reusable water bottle</label></li>
+            <li data-id="h-snack"><input type="checkbox" id="h-snack"><label for="h-snack">Trail snacks</label></li>
+            <li data-id="h-sunscreen"><input type="checkbox" id="h-sunscreen"><label for="h-sunscreen">Sunscreen <span class="meta">altitude UV is strong</span></label></li>
+            <li data-id="h-sunglasses"><input type="checkbox" id="h-sunglasses"><label for="h-sunglasses">UV sunglasses</label></li>
+            <li data-id="h-blister"><input type="checkbox" id="h-blister"><label for="h-blister">Blister kit / moleskin</label></li>
+          </ul>
+        </div>
+
+        <div class="checklist-group">
+          <h3>Electronics</h3>
+          <ul class="check">
+            <li data-id="e-phone"><input type="checkbox" id="e-phone"><label for="e-phone">Phone &amp; charger</label></li>
+            <li data-id="e-battery"><input type="checkbox" id="e-battery"><label for="e-battery">Portable battery pack</label></li>
+            <li data-id="e-adapter"><input type="checkbox" id="e-adapter"><label for="e-adapter">EU plug adapter <span class="meta">Type C/J covers CH &amp; ES</span></label></li>
+            <li data-id="e-esim"><input type="checkbox" id="e-esim"><label for="e-esim">eSIM installed ahead of time</label></li>
+          </ul>
+        </div>
+
+        <div class="checklist-group">
+          <h3>Health &amp; Extras</h3>
+          <ul class="check">
+            <li data-id="x-firstaid"><input type="checkbox" id="x-firstaid"><label for="x-firstaid">Basic first aid kit</label></li>
+            <li data-id="x-meds"><input type="checkbox" id="x-meds"><label for="x-meds">Personal medications</label></li>
+            <li data-id="x-toiletries"><input type="checkbox" id="x-toiletries"><label for="x-toiletries">Travel-size toiletries</label></li>
+            <li data-id="x-towel"><input type="checkbox" id="x-towel"><label for="x-towel">Quick-dry travel towel <span class="meta">lake swims</span></label></li>
+            <li data-id="x-drybag"><input type="checkbox" id="x-drybag"><label for="x-drybag">Ziplock / dry bag <span class="meta">Tr&uuml;mmelbach spray, boats</span></label></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-nav">
+      <a href="#online" data-page="online">&larr; Buy Online</a>
+      <span class="page-progress">03 / 04</span>
+      <a href="#costs" data-page="costs">Costs &rarr;</a>
+    </div>
+  </section>
+
+  <!-- ================= COSTS ================= -->
+  <section id="costs">
+    <div class="section-head">
+      <span class="section-num">04</span>
+      <h2>Cost Breakdown</h2>
+    </div>
+    <p class="costs-caption">Group of 3 &middot; 1 CHF &asymp; $1.24 USD &middot; excludes lodging, food &amp; incidentals</p>
+
+    <div class="table-scroll">
+      <table class="costs">
+        <thead>
+          <tr><th>Item</th><th class="num">CHF / pp</th><th class="num">USD / pp</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Jungfrau Travel Pass (7-day)</td><td class="num">310</td><td class="num">~$384</td></tr>
+          <tr><td>Grindelwald First Adventure Package</td><td class="num">85</td><td class="num">~$105</td></tr>
+          <tr><td>Schilthorn &amp; Piz Gloria</td><td class="num">75</td><td class="num">~$93</td></tr>
+          <tr><td>Via Ferrata (self-guided, gear rental)</td><td class="num">30</td><td class="num">~$37</td></tr>
+          <tr><td>Oeschinensee (round trip)</td><td class="num">40</td><td class="num">~$50</td></tr>
+          <tr><td>Lucerne train (day trip)</td><td class="num">70</td><td class="num">~$87</td></tr>
+          <tr><td>Tr&uuml;mmelbach Falls</td><td class="num">18</td><td class="num">~$22</td></tr>
+          <tr><td>Blausee</td><td class="num">10</td><td class="num">~$12</td></tr>
+          <tr><td>Swisscom eSIM (7&ndash;8 days)</td><td class="num">22</td><td class="num">~$27</td></tr>
+          <tr class="total"><td>Total per person</td><td class="num">660</td><td class="num">~$818</td></tr>
+          <tr class="grand"><td>Group of 3</td><td class="num">1,980</td><td class="num">~$2,455</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="free-box">
+      <strong>Free with the pass (or no cost):</strong> Grindelwald First gondola, M&auml;nnlichen, Iseltwald, Giessbach Falls, Harder Kulm, Gr&uuml;tschalp &amp; Winteregg, Staubbach Falls.
+    </div>
+
+    <div class="page-nav">
+      <a href="#packing" data-page="packing">&larr; Packing</a>
+      <span class="page-progress">04 / 04</span>
+      <a href="#" class="is-disabled" aria-hidden="true" tabindex="-1">Next &rarr;</a>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <p>SWITZERLAND &middot; AUG 17&ndash;24 2026 &middot; PERSONAL TRIP REFERENCE</p>
+</footer>
+
+<script>
+  (function(){
+    var STORAGE_KEY = 'swiss-trip-checklist';
+    var state = {};
+    try { state = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch(e) { state = {}; }
+
+    var boxes = document.querySelectorAll('ul.check input[type="checkbox"]');
+    boxes.forEach(function(box){
+      var li = box.closest('li');
+      if(state[box.id]){
+        box.checked = true;
+        if(li) li.classList.add('checked');
+      }
+      box.addEventListener('change', function(){
+        state[box.id] = box.checked;
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e) {}
+        if(li) li.classList.toggle('checked', box.checked);
+      });
+    });
+
+    /* larger tap target on touch devices: clicking anywhere in the row
+       (outside a link) toggles its checkbox */
+    document.querySelectorAll('ul.check li').forEach(function(li){
+      li.addEventListener('click', function(e){
+        var tag = e.target.tagName;
+        if(tag === 'A' || tag === 'INPUT' || tag === 'LABEL') return;
+        var box = li.querySelector('input[type="checkbox"]');
+        if(box){ box.checked = !box.checked; box.dispatchEvent(new Event('change')); }
+      });
+    });
+  })();
+</script>
+
+<script>
+  /* ---------- Paged navigation: sections act like flipped pages, not a long scroll ---------- */
+  (function(){
+    var order = ['schedule', 'online', 'packing', 'costs'];
+    var main = document.querySelector('main.wrap');
+    var sections = {};
+    order.forEach(function(id){ sections[id] = document.getElementById(id); });
+    var navLinks = document.querySelectorAll('a[data-page]');
+
+    function currentId(){
+      var active = main.querySelector(':scope > section.is-active');
+      return active ? active.id : order[0];
+    }
+
+    function setActiveNav(id){
+      navLinks.forEach(function(a){
+        if(a.closest('.quicknav')) a.classList.toggle('is-active', a.dataset.page === id);
+      });
+    }
+
+    function showPage(id, pushState){
+      if(order.indexOf(id) === -1) return;
+      var from = currentId();
+      if(from === id) return;
+      var dir = order.indexOf(id) > order.indexOf(from) ? 'enter-next' : 'enter-prev';
+
+      order.forEach(function(key){
+        sections[key].classList.remove('is-active', 'enter-next', 'enter-prev');
+      });
+      var target = sections[id];
+      target.classList.add('is-active', dir);
+      target.setAttribute('tabindex', '-1');
+      target.focus({ preventScroll: true });
+      setActiveNav(id);
+      window.scrollTo({ top: 0, behavior: 'auto' });
+      if(pushState !== false){
+        history.pushState(null, '', '#' + id);
+      }
+    }
+
+    document.addEventListener('click', function(e){
+      var a = e.target.closest('a[data-page]');
+      if(!a || a.classList.contains('is-disabled')) return;
+      e.preventDefault();
+      showPage(a.dataset.page);
+    });
+
+    document.addEventListener('keydown', function(e){
+      var tag = document.activeElement ? document.activeElement.tagName : '';
+      if(tag === 'INPUT' || tag === 'TEXTAREA') return;
+      var idx = order.indexOf(currentId());
+      if(e.key === 'ArrowRight' && idx < order.length - 1){ showPage(order[idx + 1]); }
+      else if(e.key === 'ArrowLeft' && idx > 0){ showPage(order[idx - 1]); }
+    });
+
+    var touchStartX = null;
+    main.addEventListener('touchstart', function(e){
+      touchStartX = e.changedTouches[0].clientX;
+    }, { passive: true });
+    main.addEventListener('touchend', function(e){
+      if(touchStartX === null) return;
+      var dx = e.changedTouches[0].clientX - touchStartX;
+      touchStartX = null;
+      if(Math.abs(dx) < 60) return;
+      var idx = order.indexOf(currentId());
+      if(dx < 0 && idx < order.length - 1) showPage(order[idx + 1]);
+      else if(dx > 0 && idx > 0) showPage(order[idx - 1]);
+    }, { passive: true });
+
+    window.addEventListener('popstate', function(){
+      var id = (location.hash || '').replace('#', '');
+      showPage(order.indexOf(id) !== -1 ? id : order[0], false);
+    });
+
+    var initial = (location.hash || '').replace('#', '');
+    if(order.indexOf(initial) !== -1 && initial !== order[0]){
+      sections[order[0]].classList.remove('is-active');
+      sections[initial].classList.add('is-active');
+      setActiveNav(initial);
+    }
+  })();
+</script>
+
+</body>
+</html>
